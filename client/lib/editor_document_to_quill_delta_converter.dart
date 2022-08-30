@@ -25,9 +25,6 @@ class EditorDocumentToQuillDeltaConverter {
         result = _convertParagraphNodeToDelta(node).compose(result);
       } else if (node is ListItemNode) {
         result = _convertListItemNodeToDelta(node).compose(result);
-      } else if (node is HorizontalRuleNode) {
-        result = Delta()
-          ..insert('\n', {'node_id': node.id, 'horizontal_rule': true});
       } else {
         throw UnsupportedDocumentNodeTypeError(node);
       }
@@ -119,8 +116,6 @@ class EditorDocumentToQuillDeltaConverter {
 
             // Contrary to the name, this also adds items to the "nodes" list.
             _convertDeltaToListItemNode(nodeId, text, part, attributes, nodes);
-          } else if (operation.hasAttribute('horizontal_rule')) {
-            nodes.add(_convertDeltaToHorizontalRuleNode(nodeId));
           } else {
             // Contrary to the name, this also adds items to the "nodes" list.
             _convertDeltaToParagraphNode(nodeId, text, part, nodes);
@@ -369,9 +364,6 @@ void _convertDeltaToListItemNode(
     nodes.add(node);
   }
 }
-
-HorizontalRuleNode _convertDeltaToHorizontalRuleNode(String nodeId) =>
-    HorizontalRuleNode(id: nodeId);
 
 void _convertDeltaToParagraphNode(
   String nodeId,
