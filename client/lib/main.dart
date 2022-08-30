@@ -9,7 +9,8 @@ import 'package:super_editor/super_editor.dart';
 
 void main() async {
   final socket =
-      await PhoenixSocket('wss://muddy-waterfall-5609.fly.dev/socket/websocket').connect();
+      await PhoenixSocket('wss://muddy-waterfall-5609.fly.dev/socket/websocket')
+          .connect();
   runApp(MyApp(socket: socket!));
 }
 
@@ -77,15 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
   /// [RealtimeDocumentEditor] with the contents of [document].
   void _handleRemoteDocumentOpened(Delta document) {
     final newDocument = _converter.deltaToEditorDocument(document);
-    final effectiveDocument = newDocument.nodes.isNotEmpty
-        ? MutableDocument(nodes: newDocument.nodes)
-        : _emptyFallbackDocument();
-
     _documentEditor.executeCommand(
       EditorCommandFunction((document, documentTransaction) {
         // Replace the document contents completely with a new document.
         List.of(document.nodes).forEach(documentTransaction.deleteNode);
-        final newNodes = List.of(effectiveDocument.nodes);
+        final newNodes = List.of(newDocument.nodes);
         for (var i = 0; i < newNodes.length; i++) {
           final node = newNodes[i];
           documentTransaction.insertNodeAt(i, node);
@@ -174,15 +171,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
-
-Document _emptyFallbackDocument() {
-  return MutableDocument(
-    nodes: [
-      ParagraphNode(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(text: 'Hello world!'),
-      ),
-    ],
-  );
 }
