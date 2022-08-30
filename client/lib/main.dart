@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _documentEditor = DocumentEditor(document: MutableDocument());
     _documentSyncEngine = DocumentSyncEngine(DocumentChannel(widget.socket))
       ..openDocument(
-        documentId: 'vikings',
+        documentId: 'vikings2',
         onDocumentOpened: _handleRemoteDocumentOpened,
         onDocumentChanged: _handleRemoteDocumentChanged,
       );
