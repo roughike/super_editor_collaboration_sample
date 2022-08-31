@@ -7,7 +7,13 @@ defmodule Collab.DocumentServer do
   require Logger
 
   defmodule State do
-    defstruct [:id, version: 0, changes: [], contents: []]
+    # Initial state
+    defstruct [
+      :id,
+      version: 0,
+      changes: [Delta.Op.insert("Hello world!\n", %{"node_id" => "hello"})],
+      contents: [Delta.Op.insert("Hello world!\n", %{"node_id" => "hello"})]
+    ]
   end
 
   # Public API
