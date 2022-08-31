@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:client/document_channel.dart';
 import 'package:client/document_selection_transformer.dart';
 import 'package:client/document_sync_engine.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:phoenix_socket/phoenix_socket.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:super_editor/super_editor.dart';
+
+const _documentId = 'vikings2';
 
 void main() async {
   final socket =
@@ -46,6 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
   late final DocumentComposer _documentComposer;
   late final DocumentEditor _documentEditor;
   late final DocumentSyncEngine _documentSyncEngine;
+  late final StreamSubscription<int> _presentUsersSubscription;
+
+  final _presentUsersCount = ValueNotifier(0);
 
   @override
   void initState() {
@@ -53,12 +60,16 @@ class _MyHomePageState extends State<MyHomePage> {
     _editorFocusNode = FocusNode();
     _documentComposer = DocumentComposer();
     _documentEditor = DocumentEditor(document: MutableDocument());
-    _documentSyncEngine = DocumentSyncEngine(DocumentChannel(widget.socket))
+    final channel = DocumentChannel(widget.socket);
+    _documentSyncEngine = DocumentSyncEngine(channel)
       ..openDocument(
-        documentId: 'vikings2',
+        documentId: _documentId,
         onDocumentOpened: _handleRemoteDocumentOpened,
         onDocumentChanged: _handleRemoteDocumentChanged,
       );
+    _presentUsersSubscription = channel
+        .watchPresentUserCount(documentId: _documentId)
+        .listen((count) => _presentUsersCount.value = count);
   }
 
   @override
@@ -66,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _editorFocusNode.dispose();
     _documentComposer.dispose();
     _documentSyncEngine.dispose();
+    _presentUsersSubscription.cancel();
     super.dispose();
   }
 
@@ -152,7 +164,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hello'),
+        title: ValueListenableBuilder<int>(
+          valueListenable: _presentUsersCount,
+          builder: (context, count, child) => Text('Users online: $count'),
+        ),
         actions: [
           IconButton(
             onPressed: _documentSyncEngine.undo,

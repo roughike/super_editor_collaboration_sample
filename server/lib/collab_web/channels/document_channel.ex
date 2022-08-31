@@ -1,21 +1,28 @@
 defmodule CollabWeb.DocumentChannel do
   use Phoenix.Channel
 
+  alias CollabWeb.Presence
   alias Collab.DocumentServer
 
   require Logger
 
   @impl true
-  def join("document:" <> id, _message, socket) do
+  def join("document:" <> id, %{"user_id" => user_id} = _params, socket) do
     {:ok, _pid} = DocumentServer.open(id)
 
-    socket = assign(socket, :document_id, id)
+    socket =
+      socket
+      |> assign(:document_id, id)
+      |> assign(:user_id, user_id)
+
     send(self(), :after_join)
     {:ok, %{channel: "document:#{id}"}, socket}
   end
 
   @impl true
   def handle_info(:after_join, socket) do
+    track_presence(socket)
+
     # Get the current state of the document and push it to the user.
     document = DocumentServer.get_contents(socket.assigns.document_id)
     push(socket, "open", document)
@@ -44,5 +51,16 @@ defmodule CollabWeb.DocumentChannel do
         Logger.error("Couldn't update document due to unknown reason. #{inspect(error)}")
         {:reply, {:error, %{"reason" => inspect(error)}}, socket}
     end
+  end
+
+  defp track_presence(socket) do
+    {:ok, _} =
+      Presence.track(socket, socket.assigns.user_id, %{
+        online_at: inspect(System.system_time(:second))
+      })
+
+    # Push the list of currently present users in the document
+    # to the current user.
+    push(socket, "presence_state", Presence.list(socket))
   end
 end

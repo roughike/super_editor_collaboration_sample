@@ -37,11 +37,13 @@ dependencies:
     git:
       url: https://github.com/superlistapp/quill-delta-dart.git
       ref: c267ddf8aa65ae86a800b50d21313fb715564d26
+  rxdart:
   super_editor:
     git:
       url: https://github.com/superlistapp/super_editor.git
       path: super_editor
       ref: d1214e97d0c255b9ab2c5cb6d9b3ead40aced0c9
+  uuid:
 
 dev_dependencies:
   flutter_test:

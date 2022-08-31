@@ -13,6 +13,7 @@ defmodule Collab.Application do
       CollabWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Collab.PubSub},
+      CollabWeb.Presence,
       # Start the Endpoint (http/https)
       CollabWeb.Endpoint
       # Start a worker by calling: Collab.Worker.start_link(arg)
