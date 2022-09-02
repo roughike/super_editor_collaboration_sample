@@ -13,7 +13,7 @@ const _documentId = 'vikings2';
 
 void main() async {
   final socket =
-      await PhoenixSocket('wss://muddy-waterfall-5609.fly.dev/socket/websocket')
+      await PhoenixSocket('ws://localhost:4000/socket/websocket')
           .connect();
   runApp(MyApp(socket: socket!));
 }
