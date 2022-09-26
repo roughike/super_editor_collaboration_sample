@@ -12,9 +12,7 @@ typedef RemoteDocumentOpenedCallback = void Function(Delta document);
 /// The [document] will be the [Delta] containing the full document and not just
 /// the diff.
 ///
-/// If [change] is null, it means that a remote document was just opened.
-///
-/// If non-null, [change] contains what changed from the previous document.
+/// The [change] contains what changed from the previous document.
 /// This can be used by the document editor transform its selection.
 ///
 /// For transforming the selection for SuperEditor, use the
